@@ -21,7 +21,7 @@ int getGameId(string line){
     return stoi(gameIdString);
 }
 
-bool getColorSum(string line, string color, int max){
+bool validateColor(string line, string color, int max){
     int pos = line.find(color);
     while (pos != -1 ){
         int index = 0;
@@ -36,14 +36,26 @@ bool getColorSum(string line, string color, int max){
     return true;
 }
 
+int getMaxDice(string line, string color){
+    int pos = line.find(color);
+    int max = 0;
+    while (pos != -1 ){
+        int index = 0;
+        int colorSum = 0;
+        while (isdigit(line[pos - COLOR_OFFSET - index])){
+            colorSum += (line[pos - COLOR_OFFSET - index] - '0') * pow(10, index);
+            index++;
+        }
+        if (colorSum > max) max = colorSum;
+        pos = line.find(color, pos + 1);
+    }
+    return max;
+}
+
 int main(){
     while (std::getline(file, line)) {
-        if (!getColorSum(line, "red", MAX_RED)) continue;
-        if (!getColorSum(line, "blue", MAX_BLUE)) continue;
-        if (!getColorSum(line, "green", MAX_GREEN)) continue;
-        cout << getGameId(line);
-        cout << '\n';
-        sum += getGameId(line);
+        int power = getMaxDice(line, "red") * getMaxDice(line, "blue") *  getMaxDice(line, "green");
+        sum += power;
     }
     file.close();
     cout << sum;
